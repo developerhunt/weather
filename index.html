@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,7 +16,6 @@
             background: linear-gradient(to right, #1e3c72, #2a5298);
             color: #fff;
         }
-
         .container {
             max-width: 500px;
             width: 100%;
@@ -30,19 +28,15 @@
             transform: translateY(-20px);
             transition: opacity 0.5s, transform 0.5s;
         }
-
         .container.visible {
             opacity: 1;
             transform: translateY(0);
         }
-
         h1 {
             margin-bottom: 20px;
             font-weight: bold;
         }
-
-        input,
-        button {
+        input, button {
             padding: 15px;
             margin: 10px;
             border: none;
@@ -51,20 +45,16 @@
             width: calc(100% - 30px);
             outline: none;
         }
-
         button {
             background: #3498db;
             color: #fff;
             cursor: pointer;
             transition: background-color 0.3s;
         }
-
         button:hover {
             background: #2980b9;
         }
-
-        .result,
-        .error {
+        .result, .error {
             padding: 15px;
             margin: 15px 0;
             font-size: 18px;
@@ -73,35 +63,27 @@
             transform: translateY(-20px);
             transition: all 0.5s ease-out;
         }
-
-        .result.visible,
-        .error.visible {
+        .result.visible, .error.visible {
             opacity: 1;
             transform: translateY(0);
         }
-
         .result {
             background: rgba(46, 204, 113, 0.9);
             color: #2c3e50;
         }
-
         .error {
             background: rgba(231, 76, 60, 0.9);
             color: #fff;
         }
-
         @media (max-width: 600px) {
             body {
                 padding: 20px;
             }
-
             .container {
                 padding: 15px;
                 box-shadow: none;
             }
-
-            input,
-            button {
+            input, button {
                 margin: 5px;
                 padding: 10px;
             }
@@ -139,7 +121,6 @@
         });
     </script>
 </head>
-
 <body>
     <div class="container">
         <h1>Live Weather Report</h1>
@@ -149,6 +130,4 @@
         <p id="error" class="error"></p>
     </div>
 </body>
-
 </html>
-
