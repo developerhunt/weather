@@ -13,11 +13,11 @@
       display: flex;
       flex-direction: column;
       min-height: 100vh;
-      transition: background 0.5s ease; /* Smooth background transition */
-      background: #fff; /* Default white background */
+      transition: background 0.5s ease;
+      background: #fff;
     }
     body.loaded {
-      background: linear-gradient(to right, #1e3c72, #2a5298); /* Initial gradient */
+      background: linear-gradient(to right, #1e3c72, #2a5298);
     }
     body.clear {
       background: linear-gradient(to right, #4776E6, #8E54E9);
@@ -139,15 +139,15 @@
     }
     .forecast-list {
       display: flex;
-      overflow-x: auto; /* Enable horizontal scrolling for smaller screens */
-      padding-bottom: 10px; /* Space for potential scrollbar */
+      overflow-x: auto;
+      padding-bottom: 10px;
     }
     .forecast-day {
       background-color: rgba(255, 255, 255, 0.1);
       margin-right: 10px;
       padding: 15px;
       border-radius: 15px;
-      min-width: 120px; /* Ensure each day has a minimum width */
+      min-width: 120px;
       text-align: center;
     }
     .forecast-day:last-child {
@@ -165,7 +165,6 @@
       font-size: 1rem;
     }
 
-    /* Responsive Design */
     @media (max-width: 600px) {
       .weather-box {
         padding: 1.5rem;
@@ -189,11 +188,13 @@
     }
   </style>
 </head>
-<body class="loaded"> <div class="container">
+<body class="loaded"> 
+  <div class="container">
     <div class="weather-box">
       <h2>🌤️ Weather Forecast</h2>
       <input type="text" id="location" placeholder="Enter your city or country" onkeypress="handleKeyPress(event)" />
       <button onclick="fetchWeather()">Check Weather</button>
+      <button id="unit-toggle" onclick="toggleUnit()">Switch to °F</button>
       <div class="loader" id="loader"></div>
       <div id="result"></div>
       <div id="error" style="color: red;"></div>
@@ -204,9 +205,11 @@
   <div id="footer">🌍 Hosted by <strong>Pradeepkumar G</strong></div>
 
   <script>
+    let isCelsius = true; 
+
     document.addEventListener('DOMContentLoaded', () => {
-      // Ensure the initial background is set when the page loads
       document.body.classList.add('loaded');
+      fetchIPAndLocation();
     });
 
     function handleKeyPress(event) {
@@ -219,36 +222,33 @@
       try {
         const res = await fetch("https://ipinfo.io/json?token=236fab372a1ef1");
         const data = await res.json();
-        if (!data.ip.includes(".")) {
-          document.getElementById("ip-location").innerText =
-            "Your IP Address: IPv6 address detected. Only IPv4 addresses are shown., Location: " + data.city + ", " + data.country;
-        } else {
-          document.getElementById("ip-location").innerText =
-            `Your IP Address: ${data.ip}, Location: ${data.city}, ${data.country}`;
-        }
+        const location = data.city || 'New York';
+        const ip = data.ip;
+        const region = data.region;
+        const country = data.country;
+        document.getElementById("ip-location").innerText = `Your IP Address: ${ip}, Location: ${location}, ${region}, ${country}`;
+        fetchWeather(location);  
       } catch (err) {
         console.log("IP/Location fetch error", err);
       }
     }
 
-    fetchIPAndLocation();
-
-    async function fetchWeather() {
+    async function fetchWeather(location = '') {
       const locationInput = document.getElementById('location');
-      const location = locationInput.value.trim();
+      const locationValue = location || locationInput.value.trim();
       const result = document.getElementById('result');
       const error = document.getElementById('error');
       const loader = document.getElementById('loader');
       const body = document.body;
 
-      if (!location) return;
+      if (!locationValue) return;
 
       result.classList.remove('visible');
       error.classList.remove('visible');
       loader.classList.add('show');
 
       try {
-        const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(location)}`);
+        const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(locationValue)}`);
         const geoData = await geoRes.json();
         if (!geoData.results || geoData.results.length === 0) {
           throw new Error("City not found.");
@@ -263,9 +263,9 @@
         const current = weatherData.current_weather;
         const forecast = weatherData.daily;
 
-        // Set dynamic background
         const currentWeatherCode = current.weathercode;
-        body.className = 'loaded'; // Ensure the base gradient is applied before specific weather
+        body.className = 'loaded'; 
+
         if ([0, 1].includes(currentWeatherCode)) {
           body.classList.add('clear');
         } else if ([2, 3].includes(currentWeatherCode)) {
@@ -275,7 +275,7 @@
         } else if ([71, 73, 75, 77, 85, 86].includes(currentWeatherCode)) {
           body.classList.add('snow');
         } else if ([95, 96, 99].includes(currentWeatherCode)) {
-          body.classList.add('rain'); // Thunderstorms often involve rain
+          body.classList.add('rain');
         } else if ([45, 48].includes(currentWeatherCode)) {
           body.classList.add('mist');
         }
@@ -288,8 +288,8 @@
 
         for (let i = 0; i < 7; i++) {
           const date = forecast.time[i];
-          const minTemp = forecast.temperature_2m_min[i];
-          const maxTemp = forecast.temperature_2m_max[i];
+          const minTemp = isCelsius ? forecast.temperature_2m_min[i] : (forecast.temperature_2m_min[i] * 9/5) + 32;
+          const maxTemp = isCelsius ? forecast.temperature_2m_max[i] : (forecast.temperature_2m_max[i] * 9/5) + 32;
           const icon = getWeatherIcon(forecast.weathercode[i]);
           const dayOfWeek = new Date(date).toLocaleDateString('en-US', { weekday: 'short' });
 
@@ -297,68 +297,47 @@
             <div class="forecast-day">
               <div class="forecast-day-date">${dayOfWeek}</div>
               <div class="forecast-day-icon">${icon}</div>
-              <div class="forecast-day-temps">${minTemp}°C / ${maxTemp}°C</div>
+              <div class="forecast-day-temps">${Math.round(minTemp)}° / ${Math.round(maxTemp)}°</div>
             </div>
           `;
         }
 
-        forecastHTML += `
-            </div>
-          </div>
-        `;
+        forecastHTML += `</div></div>`;
 
         result.innerHTML = `
           <div class="current-weather">
-            <div class="current-weather-icon">${getWeatherIcon(current.weathercode)}</div>
-            <strong class="current-weather-temp">${current.temperature}°C</strong><br>
-            <span class="current-weather-location">${name}, ${country}</span><br>
-            Wind: ${current.windspeed} km/h
+            <div class="current-weather-icon">${getWeatherIcon(currentWeatherCode)}</div>
+            <div class="current-weather-temp">${Math.round(isCelsius ? current.temperature : (current.temperature * 9/5) + 32)}°</div>
+            <div class="current-weather-location">${name}, ${country}</div>
           </div>
           ${forecastHTML}
         `;
 
         result.classList.add('visible');
+        loader.classList.remove('show');
       } catch (err) {
-        body.className = 'loaded'; // Revert to the initial background on error
         error.innerText = `Error: ${err.message}`;
         error.classList.add('visible');
-      } finally {
         loader.classList.remove('show');
       }
     }
 
-    function getWeatherIcon(code) {
-      const icons = {
-        0: '☀️',    // Clear sky
-        1: '🌤️',   // Mainly clear
-        2: '⛅',   // Partly cloudy
-        3: '☁️',   // Overcast
-        45: '🌫️',  // Fog
-        48: '🌫️',  // Depositing rime fog
-        51: '🌦️',  // Drizzle: Light intensity
-        53: '🌦️',  // Drizzle: Moderate intensity
-        55: '🌧️',   // Drizzle: Dense intensity
-        56: '🌧️',   // Freezing Drizzle: Light intensity
-        57: '🌧️',   // Freezing Drizzle: Dense intensity
-        61: '🌧️',   // Rain: Slight intensity
-        63: '🌧️',   // Rain: Moderate intensity
-        65: '🌧️',   // Rain: Heavy intensity
-        66: '🌨️',  // Freezing Rain: Light intensity
-        67: '🌨️',  // Freezing Rain: Heavy intensity
-        71: '❄️',   // Snow fall: Slight intensity
-        73: '❄️',   // Snow fall: Moderate intensity
-        75: '❄️',   // Snow fall: Heavy intensity
-        77: '❄️',   // Snow grains
-        80: '🌦️',  // Rain showers: Slight intensity
-        81: '🌧️',   // Rain showers: Moderate intensity
-        82: '🌧️',   // Rain showers: Violent intensity
-        85: '🌨️',  // Snow showers: Slight intensity
-        86: '🌨️',  // Snow showers: Heavy intensity
-        95: '⛈️',  // Thunderstorm: Slight or moderate
-        96: '⛈️',  // Thunderstorm with slight hail
-        99: '⛈️',  // Thunderstorm with heavy hail
-      };
-      return icons[code] || '🌈';
+    function getWeatherIcon(weatherCode) {
+      switch (weatherCode) {
+        case 0: case 1: return '☀️'; 
+        case 2: case 3: return '🌤️'; 
+        case 45: case 48: return '🌫️'; 
+        case 51: case 53: case 55: return '🌧️'; 
+        case 71: case 73: case 75: return '❄️'; 
+        default: return '🌦️'; 
+      }
+    }
+
+    function toggleUnit() {
+      isCelsius = !isCelsius;
+      const unitToggleButton = document.getElementById('unit-toggle');
+      unitToggleButton.innerText = isCelsius ? 'Switch to °F' : 'Switch to °C';
+      fetchWeather(); // Refetch the weather based on the new unit
     }
   </script>
 </body>
