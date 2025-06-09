@@ -197,6 +197,7 @@
     .weather-section:nth-child(2) { animation-delay: 0.2s; }
     .weather-section:nth-child(3) { animation-delay: 0.3s; }
     .weather-section:nth-child(4) { animation-delay: 0.4s; }
+    .weather-section:nth-child(5) { animation-delay: 0.5s; }
 
 
     /* --- Current Weather & Local Time --- */
@@ -215,6 +216,16 @@
     .detail-value { font-weight: 600; color: var(--primary-text-color); text-align: right; }
     .detail-value .unit { font-size: 0.8em; font-weight: 400; margin-left: 4px; opacity: 0.8; color: var(--secondary-text-color); }
 
+    /* --- Hourly Forecast Styling (NEW) --- */
+    .hourly-forecast-list { display: flex; overflow-x: auto; padding: 10px 5px 15px 5px; margin: 0 -5px; scroll-snap-type: x mandatory; &::-webkit-scrollbar { height: 8px; } &::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.2); border-radius: 4px; } &::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 4px; } &::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.4); } }
+    .hourly-item { display: flex; flex-direction: column; align-items: center; justify-content: space-around; background-color: var(--forecast-bg); margin: 0 6px; padding: 12px 10px; border-radius: 16px; min-width: 85px; text-align: center; flex-shrink: 0; border: 1px solid var(--detail-border-color); transition: all 0.3s ease; cursor: pointer; scroll-snap-align: start; }
+    .hourly-item:hover:not(.selected) { background-color: var(--forecast-hover-bg); transform: translateY(-3px); }
+    .hourly-item.selected { background-color: var(--forecast-selected-bg); border-color: var(--forecast-selected-border); transform: scale(1.03); }
+    .hourly-item-time { font-family: var(--font-secondary); font-size: 0.8rem; font-weight: 700; margin-bottom: 8px; color: var(--secondary-text-color); }
+    .hourly-item-icon { font-size: 1.8rem; margin-bottom: 8px; }
+    .hourly-item-temp { font-family: var(--font-secondary); font-size: 1rem; font-weight: 600; margin-bottom: 8px; }
+    .hourly-item-precip { font-family: var(--font-secondary); font-size: 0.75rem; color: #81b2d6; display: flex; align-items: center; gap: 4px; }
+
     /* --- Forecast Styling --- */
     .forecast-list { display: flex; overflow-x: auto; padding: 10px 5px 15px 5px; margin: 0 -5px; scroll-snap-type: x mandatory; &::-webkit-scrollbar { height: 8px; } &::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.2); border-radius: 4px; } &::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 4px; } &::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.4); } }
     .forecast-day { background-color: var(--forecast-bg); margin: 0 8px; padding: 12px 18px; border-radius: 16px; min-width: 130px; text-align: center; flex-shrink: 0; border: 1px solid var(--detail-border-color); transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.3s ease; cursor: pointer; scroll-snap-align: start; }
@@ -226,11 +237,11 @@
     .forecast-day.selected { background-color: var(--forecast-selected-bg); border-color: var(--forecast-selected-border); transform: scale(1.03); }
     .forecast-day:hover:not(.selected) { background-color: var(--forecast-hover-bg); transform: translateY(-3px); }
 
-    /* --- Forecast Detail Display Area --- */
-    #forecast-detail-display { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--detail-border-color); min-height: 150px; text-align: left; transition: opacity 0.4s ease, transform 0.4s ease; transform: translateY(10px); opacity: 0; }
-    #forecast-detail-display.visible { opacity: 1; transform: translateY(0); }
-    #forecast-detail-display .section-title { margin-bottom: 1rem; font-size: 1rem; }
-    #forecast-detail-display:empty { border-top: none; padding-top: 0; margin-top: 0; min-height: 0; opacity: 0 !important; /* Ensure hidden when empty */ }
+    /* --- Detail Display Areas --- */
+    #hourly-detail-display, #forecast-detail-display { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--detail-border-color); min-height: 100px; text-align: left; transition: opacity 0.4s ease, transform 0.4s ease; transform: translateY(10px); opacity: 0; }
+    #hourly-detail-display.visible, #forecast-detail-display.visible { opacity: 1; transform: translateY(0); }
+    #hourly-detail-display:empty, #forecast-detail-display:empty { border-top: none; padding-top: 0; margin-top: 0; min-height: 0; opacity: 0 !important; /* Ensure hidden when empty */ }
+
 
     /* --- IP Location Display --- */
     #ip-location { margin-top: 1.5rem; font-size: 0.8rem; opacity: 0.6; font-family: var(--font-secondary); }
@@ -311,12 +322,16 @@
         .forecast-day { min-width: 105px; padding: 10px 12px; }
         .forecast-day-icon { font-size: 1.8rem; }
         .forecast-day-temps { font-size: 0.9rem; }
+        .hourly-item { min-width: 75px; padding: 10px 8px; }
+        .hourly-item-icon { font-size: 1.6rem; }
+        .hourly-item-temp { font-size: 0.9rem; }
         button { padding: 10px 20px; font-size: 0.9rem; }
         #disclaimer-content { padding: 2rem 1.5rem; }
         #disclaimer-content h3 { font-size: 1.4rem; }
         #disclaimer-content p { font-size: 0.95rem; }
         #disclaimer-button { padding: 12px 24px; }
         .detailed-weather-grid { grid-template-columns: 1fr; gap: 8px; }
+        #hourly-detail-display .detailed-weather-grid,
         #forecast-detail-display .detailed-weather-grid { grid-template-columns: 1fr; gap: 8px; }
         .section-title { font-size: 0.9rem; }
         #local-time-display { font-size: 0.85rem; }
@@ -388,39 +403,46 @@
 
     // --- Event Listeners ---
     document.addEventListener('DOMContentLoaded', () => {
-      // Show splash screen initially
       splashScreen.classList.remove('fade-out');
       mainContent.classList.remove('visible');
-      bodyElement.style.overflow = 'hidden'; // Prevent scrolling during splash
+      bodyElement.style.overflow = 'hidden';
 
-      // Simulate a loading time for the splash screen
       setTimeout(() => {
         splashScreen.classList.add('fade-out');
-        // After splash screen fades out, show main content and allow scrolling
         splashScreen.addEventListener('transitionend', () => {
           mainContent.classList.add('visible');
-          bodyElement.style.overflow = 'auto'; // Allow scrolling after splash
-        }, { once: true }); // Ensure this listener runs only once
+          bodyElement.style.overflow = 'auto';
+        }, { once: true });
+        fetchIPAndLocation();
+      }, 4000);
 
-        fetchIPAndLocation(); // Fetch IP and initial weather after splash
-      }, 4000); // Increased display time to 4 seconds for new animations
-
-      // Disclaimer logic: Button hides the modal
       disclaimerButton.addEventListener('click', () => {
         disclaimerModal.classList.add('hidden');
-        // display: none is not strictly needed due to visibility: hidden and pointer-events: none
       });
 
-      // Forecast day click listener
       resultDiv.addEventListener('click', function(event) {
          const forecastDay = event.target.closest('.forecast-day');
          if (forecastDay && currentWeatherData) {
              const index = parseInt(forecastDay.dataset.index, 10);
              displayForecastDetail(index);
-             document.querySelectorAll('.forecast-day.selected').forEach(el => el.classList.remove('selected'));
+             document.querySelectorAll('.forecast-day.selected, .hourly-item.selected').forEach(el => el.classList.remove('selected'));
              forecastDay.classList.add('selected');
+             document.getElementById('hourly-detail-display').innerHTML = '';
+             document.getElementById('hourly-detail-display').classList.remove('visible');
              const detailDisplay = document.getElementById('forecast-detail-display');
-             if (detailDisplay) detailDisplay.classList.add('visible'); // Make detail visible
+             if (detailDisplay) detailDisplay.classList.add('visible');
+         }
+
+         const hourlyItem = event.target.closest('.hourly-item');
+         if (hourlyItem && currentWeatherData) {
+             const index = parseInt(hourlyItem.dataset.index, 10);
+             displayHourlyDetail(index);
+             document.querySelectorAll('.hourly-item.selected, .forecast-day.selected').forEach(el => el.classList.remove('selected'));
+             hourlyItem.classList.add('selected');
+             document.getElementById('forecast-detail-display').innerHTML = '';
+             document.getElementById('forecast-detail-display').classList.remove('visible');
+             const detailDisplay = document.getElementById('hourly-detail-display');
+             if (detailDisplay) detailDisplay.classList.add('visible');
          }
       });
     });
@@ -428,17 +450,16 @@
     function handleKeyPress(event) { if (event.key === 'Enter') { fetchWeather(); } }
 
     // --- Time Clock Functions ---
-    function startLocalTimeClock(timezone) { /* As before */ stopLocalTimeClock(); const timeDisplayElement = document.getElementById('local-time-display'); if (!timeDisplayElement || !timezone) return; const updateTime = () => { try { const now = new Date(); const optionsDate = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: timezone }; const optionsTime = { hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true, timeZone: timezone }; timeDisplayElement.textContent = `${now.toLocaleDateString('en-US', optionsDate)} | ${now.toLocaleTimeString('en-US', optionsTime)}`; } catch (e) { console.error("Error updating time:", e); timeDisplayElement.textContent = "Error displaying local time."; stopLocalTimeClock(); } }; updateTime(); localTimeIntervalId = setInterval(updateTime, 1000); }
-    function stopLocalTimeClock() { /* As before */ if (localTimeIntervalId) { clearInterval(localTimeIntervalId); localTimeIntervalId = null; } const timeDisplayElement = document.getElementById('local-time-display'); if (timeDisplayElement) timeDisplayElement.textContent = ''; }
+    function startLocalTimeClock(timezone) { stopLocalTimeClock(); const timeDisplayElement = document.getElementById('local-time-display'); if (!timeDisplayElement || !timezone) return; const updateTime = () => { try { const now = new Date(); const optionsDate = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: timezone }; const optionsTime = { hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true, timeZone: timezone }; timeDisplayElement.textContent = `${now.toLocaleDateString('en-US', optionsDate)} | ${now.toLocaleTimeString('en-US', optionsTime)}`; } catch (e) { console.error("Error updating time:", e); timeDisplayElement.textContent = "Error displaying local time."; stopLocalTimeClock(); } }; updateTime(); localTimeIntervalId = setInterval(updateTime, 1000); }
+    function stopLocalTimeClock() { if (localTimeIntervalId) { clearInterval(localTimeIntervalId); localTimeIntervalId = null; } const timeDisplayElement = document.getElementById('local-time-display'); if (timeDisplayElement) timeDisplayElement.textContent = ''; }
 
     // --- Fetching Data ---
-    async function fetchIPAndLocation() { /* As before */ try { const res = await fetch("https://ipinfo.io/json?token=236fab372a1ef1"); if (!res.ok) throw new Error(`IP Info fetch failed: ${res.status}`); const data = await res.json(); const city = data.city || 'Coimbatore'; const ip = data.ip || 'N/A'; const region = data.region || 'N/A'; const country = data.country || 'N/A'; ipLocationDiv.innerText = `IP: ${ip} | ${city}, ${region}, ${country}`; fetchWeather(city); } catch (err) { console.error("IP/Location fetch error:", err); ipLocationDiv.innerText = "Could not auto-detect location."; showError("Could not fetch location, showing default."); fetchWeather('Coimbatore'); } }
+    async function fetchIPAndLocation() { try { const res = await fetch("https://ipinfo.io/json?token=236fab372a1ef1"); if (!res.ok) throw new Error(`IP Info fetch failed: ${res.status}`); const data = await res.json(); const city = data.city || 'Coimbatore'; const ip = data.ip || 'N/A'; const region = data.region || 'N/A'; const country = data.country || 'N/A'; ipLocationDiv.innerText = `IP: ${ip} | ${city}, ${region}, ${country}`; fetchWeather(city); } catch (err) { console.error("IP/Location fetch error:", err); ipLocationDiv.innerText = "Could not auto-detect location."; showError("Could not fetch location, showing default."); fetchWeather('Coimbatore'); } }
     async function fetchWeather(location = null) {
         const locationValue = location || locationInput.value.trim();
         if (!locationValue) { showError("Please enter a location."); return; }
         clearResults(); loaderDiv.classList.add('show'); bodyElement.className = 'loaded';
         try {
-            // Added language=en to potentially improve results
             const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(locationValue)}&count=1&language=en`);
             if (!geoRes.ok) throw new Error(`Geocoding failed: ${geoRes.status}`);
             const geoData = await geoRes.json();
@@ -446,8 +467,9 @@
             const { latitude, longitude, name, country, timezone } = geoData.results[0];
             currentLocation = { name, country, latitude, longitude, timezone: timezone || 'auto' };
             const currentParams = 'temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,surface_pressure,uv_index,precipitation,precipitation_probability,dew_point_2m,cloud_cover,visibility';
+            const hourlyParams = 'temperature_2m,relative_humidity_2m,precipitation_probability,weather_code,wind_speed_10m,wind_gusts_10m';
             const dailyParams = 'weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,uv_index_max,precipitation_sum,wind_speed_10m_max,precipitation_probability_max,wind_gusts_10m_max';
-            const weatherApiUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=${currentParams}&daily=${dailyParams}&timezone=${currentLocation.timezone}`;
+            const weatherApiUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=${currentParams}&hourly=${hourlyParams}&daily=${dailyParams}&timezone=${currentLocation.timezone}`;
             const airQualityApiUrl = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${latitude}&longitude=${longitude}&current=us_aqi,european_aqi&timezone=${currentLocation.timezone}`;
             const [weatherResponse, airQualityResponse] = await Promise.all([ fetch(weatherApiUrl), fetch(airQualityApiUrl) ]);
             if (!weatherResponse.ok) throw new Error(`Weather fetch failed: ${weatherResponse.status}`);
@@ -462,7 +484,7 @@
     }
 
     // --- Formatting Helpers ---
-    const formatTime = (dateString, timeZone) => { if (!dateString) return "N/A"; try { return new Date(dateString).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: timeZone }); } catch (e) { console.error(`Time formatting error for ${dateString} with TZ ${timeZone}:`, e); return "Invalid Time"; } };
+    const formatTime = (dateString, timeZone, options = { hour: 'numeric', minute: '2-digit', hour12: true }) => { if (!dateString) return "N/A"; try { return new Date(dateString).toLocaleTimeString('en-US', { ...options, timeZone: timeZone }); } catch (e) { console.error(`Time formatting error for ${dateString} with TZ ${timeZone}:`, e); return "Invalid Time"; } };
     const formatTemp = (tempC) => { if (tempC == null) return "N/A"; const temp = isCelsius ? tempC : celsiusToFahrenheit(tempC); return `${Math.round(temp)}°`; };
     const formatVisibility = (meters) => { if (meters == null) return "N/A"; const km = meters / 1000; return `${km.toFixed(1)}<span class="unit">km</span>`; };
     const formatUVIndex = (uv) => { if (uv == null) return "N/A"; let level = ""; uv = Math.round(uv); if (uv <= 2) level = "(Low)"; else if (uv <= 5) level = "(Moderate)"; else if (uv <= 7) level = "(High)"; else if (uv <= 10) level = "(Very High)"; else if (uv > 10) level = "(Extreme)"; return `${uv} ${level}`; };
@@ -472,36 +494,154 @@
     const formatPrecip = (val) => (val == null ? 'N/A' : `${val.toFixed(1)}<span class="unit">mm</span>`);
 
     // --- Display Functions ---
-    function displayWeather() { /* As before */ if (!currentWeatherData || !currentLocation.name) return; const current = currentWeatherData.current; const daily = currentWeatherData.daily; const currentAQI = currentAirQualityData?.current; const currentWeatherCode = current.weather_code; updateBackground(currentWeatherCode); const { name, country, timezone } = currentLocation; const unitSymbol = isCelsius ? 'C' : 'F'; resultDiv.innerHTML = ` <div class="weather-section current-summary"> <div class="current-weather-location">${name}, ${country}</div> <div id="local-time-display"></div> </div> <div class="weather-section current-weather"> <div class="current-weather-icon">${getWeatherIcon(currentWeatherCode)}</div> <div class="current-weather-temp">${formatTemp(current.temperature_2m)}${unitSymbol}</div> <div class="current-weather-details"> Feels like ${formatTemp(current.apparent_temperature)} | Humidity: ${formatPercent(current.relative_humidity_2m)} | Wind: ${formatSpeed(current.wind_speed_10m)} </div> <div class="current-weather-description">${getWeatherDescription(currentWeatherCode)}</div> </div> <div class="weather-section detailed-weather"> <div class="section-title">Current Details</div> <div class="detailed-weather-grid"> <div class="detail-item"><span class="detail-icon">💨</span><span class="detail-label">Wind speed</span><span class="detail-value">${formatSpeed(current.wind_speed_10m)}</span></div> <div class="detail-item"><span class="detail-icon">🌡️</span><span class="detail-label">Dew point</span><span class="detail-value">${formatTemp(current.dew_point_2m)}</span></div> <div class="detail-item"><span class="detail-icon">🧭</span><span class="detail-label">Pressure</span><span class="detail-value">${Math.round(current.surface_pressure) ?? 'N/A'}<span class="unit">hPa</span></span></div> <div class="detail-item"><span class="detail-icon">☁️</span><span class="detail-label">Cloud cover</span><span class="detail-value">${formatPercent(current.cloud_cover)}</span></div> <div class="detail-item"><span class="detail-icon">💧</span><span class="detail-label">Humidity</span><span class="detail-value">${formatPercent(current.relative_humidity_2m)}</span></div> <div class="detail-item"><span class="detail-icon">👁️</span><span class="detail-label">Visibility</span><span class="detail-value">${formatVisibility(current.visibility)}</span></div> <div class="detail-item"><span class="detail-icon">☀️</span><span class="detail-label">UV Index</span><span class="detail-value">${formatUVIndex(current.uv_index)}</span></div> <div class="detail-item"><span class="detail-icon">🌅</span><span class="detail-label">Sunrise</span><span class="detail-value">${formatTime(daily.sunrise[0], timezone)}</span></div> <div class="detail-item"><span class="detail-icon">☔</span><span class="detail-label">Precipitation (1h)</span><span class="detail-value">${formatPrecip(current.precipitation)}</span></div> <div class="detail-item"><span class="detail-icon">🌇</span><span class="detail-label">Sunset</span><span class="detail-value">${formatTime(daily.sunset[0], timezone)}</span></div> <div class="detail-item"><span class="detail-icon">🤔</span><span class="detail-label">Precip. Probability</span><span class="detail-value">${formatPercent(current.precipitation_probability)}</span></div> <div class="detail-item"><span class="detail-icon">🍃</span><span class="detail-label">Air Quality (AQI)</span><span class="detail-value">${formatAQI(currentAQI)}</span></div> </div> </div> <div class="weather-section forecast"> <div class="section-title">7-Day Forecast</div> <div class="forecast-list"> ${daily.time.slice(0, 7).map((date, i) => ` <div class="forecast-day" data-index="${i}"> <div class="forecast-day-date">${new Date(date + 'T00:00:00Z').toLocaleDateString('en-US', { weekday: 'short', timeZone: timezone })}</div> <div class="forecast-day-icon">${getWeatherIcon(daily.weather_code[i])}</div> <div class="forecast-day-temps">${formatTemp(daily.temperature_2m_min[i])} / ${formatTemp(daily.temperature_2m_max[i])}</div> </div> `).join('')} </div> <div id="forecast-detail-display"></div> </div> `; resultDiv.classList.add('visible'); errorDiv.classList.remove('visible'); }
-    function displayForecastDetail(index) { /* As before */ if (!currentWeatherData || index < 0 || index >= currentWeatherData.daily.time.length) return; const daily = currentWeatherData.daily; const { timezone } = currentLocation; const date = daily.time[index]; const detailDisplay = document.getElementById('forecast-detail-display'); const titleDate = new Date(date + 'T00:00:00Z').toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: timezone }); detailDisplay.innerHTML = ` <div class="section-title">Details for ${titleDate}</div> <div class="detailed-weather-grid"> <div class="detail-item"><span class="detail-icon">💨</span><span class="detail-label">Max Wind</span><span class="detail-value">${formatSpeed(daily.wind_speed_10m_max[index])}</span></div> <div class="detail-item"><span class="detail-icon">🍃</span><span class="detail-label">Max Gusts</span><span class="detail-value">${formatSpeed(daily.wind_gusts_10m_max[index])}</span></div> <div class="detail-item"><span class="detail-icon">☀️</span><span class="detail-label">Max UV Index</span><span class="detail-value">${formatUVIndex(daily.uv_index_max[index])}</span></div> <div class="detail-item"><span class="detail-icon">🌅</span><span class="detail-label">Sunrise</span><span class="detail-value">${formatTime(daily.sunrise[index], timezone)}</span></div> <div class="detail-item"><span class="detail-icon">☔</span><span class="detail-label">Total Precip.</span><span class="detail-value">${formatPrecip(daily.precipitation_sum[index])}</span></div> <div class="detail-item"><span class="detail-icon">🌇</span><span class="detail-label">Sunset</span><span class="detail-value">${formatTime(daily.sunset[index], timezone)}</span></div> <div class="detail-item"><span class="detail-icon">🤔</span><span class="detail-label">Max Precip. Prob.</span><span class="detail-value">${formatPercent(daily.precipitation_probability_max[index])}</span></div> <div class="detail-item"><span class="detail-icon">ℹ️</span><span class="detail-label">Condition</span><span class="detail-value">${getWeatherDescription(daily.weather_code[index])}</span></div> </div> `; }
+    function displayWeather() {
+        if (!currentWeatherData || !currentLocation.name) return;
+        const { current, hourly, daily } = currentWeatherData;
+        const currentAQI = currentAirQualityData?.current;
+        const currentWeatherCode = current.weather_code;
+        updateBackground(currentWeatherCode);
+        const { name, country, timezone } = currentLocation;
+        const unitSymbol = isCelsius ? 'C' : 'F';
+
+        // Find the index of the current hour in the hourly forecast
+        const now = new Date();
+        const currentHourIndex = hourly.time.findIndex(timeStr => new Date(timeStr) >= now);
+
+        const hourlyForecastHtml = hourly.time.slice(currentHourIndex, currentHourIndex + 24).map((time, i) => {
+            const absoluteIndex = currentHourIndex + i;
+            return `
+            <div class="hourly-item" data-index="${absoluteIndex}">
+                <div class="hourly-item-time">${formatTime(time, timezone, { hour: 'numeric', hour12: true })}</div>
+                <div class="hourly-item-icon">${getWeatherIcon(hourly.weather_code[absoluteIndex])}</div>
+                <div class="hourly-item-temp">${formatTemp(hourly.temperature_2m[absoluteIndex])}</div>
+                <div class="hourly-item-precip">💧 ${Math.round(hourly.precipitation_probability[absoluteIndex])}%</div>
+            </div>`;
+        }).join('');
+
+        resultDiv.innerHTML = `
+            <div class="weather-section current-summary">
+                <div class="current-weather-location">${name}, ${country}</div>
+                <div id="local-time-display"></div>
+            </div>
+            <div class="weather-section current-weather">
+                <div class="current-weather-icon">${getWeatherIcon(currentWeatherCode)}</div>
+                <div class="current-weather-temp">${formatTemp(current.temperature_2m)}${unitSymbol}</div>
+                <div class="current-weather-details">
+                    Feels like ${formatTemp(current.apparent_temperature)} | Humidity: ${formatPercent(current.relative_humidity_2m)} | Wind: ${formatSpeed(current.wind_speed_10m)}
+                </div>
+                <div class="current-weather-description">${getWeatherDescription(currentWeatherCode)}</div>
+            </div>
+            <div class="weather-section detailed-weather">
+                <div class="section-title">Current Details</div>
+                <div class="detailed-weather-grid">
+                    <div class="detail-item"><span class="detail-icon">💨</span><span class="detail-label">Wind speed</span><span class="detail-value">${formatSpeed(current.wind_speed_10m)}</span></div>
+                    <div class="detail-item"><span class="detail-icon">🌡️</span><span class="detail-label">Dew point</span><span class="detail-value">${formatTemp(current.dew_point_2m)}</span></div>
+                    <div class="detail-item"><span class="detail-icon">🧭</span><span class="detail-label">Pressure</span><span class="detail-value">${Math.round(current.surface_pressure) ?? 'N/A'}<span class="unit">hPa</span></span></div>
+                    <div class="detail-item"><span class="detail-icon">☁️</span><span class="detail-label">Cloud cover</span><span class="detail-value">${formatPercent(current.cloud_cover)}</span></div>
+                    <div class="detail-item"><span class="detail-icon">💧</span><span class="detail-label">Humidity</span><span class="detail-value">${formatPercent(current.relative_humidity_2m)}</span></div>
+                    <div class="detail-item"><span class="detail-icon">👁️</span><span class="detail-label">Visibility</span><span class="detail-value">${formatVisibility(current.visibility)}</span></div>
+                    <div class="detail-item"><span class="detail-icon">☀️</span><span class="detail-label">UV Index</span><span class="detail-value">${formatUVIndex(current.uv_index)}</span></div>
+                    <div class="detail-item"><span class="detail-icon">🌅</span><span class="detail-label">Sunrise</span><span class="detail-value">${formatTime(daily.sunrise[0], timezone)}</span></div>
+                    <div class="detail-item"><span class="detail-icon">☔</span><span class="detail-label">Precipitation (1h)</span><span class="detail-value">${formatPrecip(current.precipitation)}</span></div>
+                    <div class="detail-item"><span class="detail-icon">🌇</span><span class="detail-label">Sunset</span><span class="detail-value">${formatTime(daily.sunset[0], timezone)}</span></div>
+                    <div class="detail-item"><span class="detail-icon">🤔</span><span class="detail-label">Precip. Probability</span><span class="detail-value">${formatPercent(current.precipitation_probability)}</span></div>
+                    <div class="detail-item"><span class="detail-icon">🍃</span><span class="detail-label">Air Quality (AQI)</span><span class="detail-value">${formatAQI(currentAQI)}</span></div>
+                </div>
+            </div>
+            <div class="weather-section hourly-forecast">
+                <div class="section-title">24-Hour Forecast</div>
+                <div class="hourly-forecast-list">${hourlyForecastHtml}</div>
+                <div id="hourly-detail-display"></div>
+            </div>
+            <div class="weather-section forecast">
+                <div class="section-title">7-Day Forecast</div>
+                <div class="forecast-list">
+                    ${daily.time.slice(0, 7).map((date, i) => `
+                    <div class="forecast-day" data-index="${i}">
+                        <div class="forecast-day-date">${new Date(date + 'T00:00:00Z').toLocaleDateString('en-US', { weekday: 'short', timeZone: timezone })}</div>
+                        <div class="forecast-day-icon">${getWeatherIcon(daily.weather_code[i])}</div>
+                        <div class="forecast-day-temps">${formatTemp(daily.temperature_2m_min[i])} / ${formatTemp(daily.temperature_2m_max[i])}</div>
+                    </div>`).join('')}
+                </div>
+                <div id="forecast-detail-display"></div>
+            </div>`;
+        resultDiv.classList.add('visible');
+        errorDiv.classList.remove('visible');
+    }
+
+    function displayHourlyDetail(index) {
+        if (!currentWeatherData || index < 0 || index >= currentWeatherData.hourly.time.length) return;
+        const { hourly } = currentWeatherData;
+        const { timezone } = currentLocation;
+        const time = hourly.time[index];
+        const detailDisplay = document.getElementById('hourly-detail-display');
+        const titleTime = formatTime(time, timezone, { weekday: 'short', hour: 'numeric', minute: '2-digit', hour12: true });
+
+        detailDisplay.innerHTML = `
+            <div class="section-title">Details for ${titleTime}</div>
+            <div class="detailed-weather-grid">
+                <div class="detail-item"><span class="detail-icon">💨</span><span class="detail-label">Wind</span><span class="detail-value">${formatSpeed(hourly.wind_speed_10m[index])}</span></div>
+                <div class="detail-item"><span class="detail-icon">🍃</span><span class="detail-label">Wind Gusts</span><span class="detail-value">${formatSpeed(hourly.wind_gusts_10m[index])}</span></div>
+                <div class="detail-item"><span class="detail-icon">💧</span><span class="detail-label">Humidity</span><span class="detail-value">${formatPercent(hourly.relative_humidity_2m[index])}</span></div>
+                <div class="detail-item"><span class="detail-icon">🤔</span><span class="detail-label">Precip. Probability</span><span class="detail-value">${formatPercent(hourly.precipitation_probability[index])}</span></div>
+                <div class="detail-item"><span class="detail-icon">ℹ️</span><span class="detail-label">Condition</span><span class="detail-value">${getWeatherDescription(hourly.weather_code[index])}</span></div>
+            </div>`;
+    }
+
+    function displayForecastDetail(index) {
+        if (!currentWeatherData || index < 0 || index >= currentWeatherData.daily.time.length) return;
+        const { daily } = currentWeatherData;
+        const { timezone } = currentLocation;
+        const date = daily.time[index];
+        const detailDisplay = document.getElementById('forecast-detail-display');
+        const titleDate = new Date(date + 'T00:00:00Z').toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: timezone });
+        detailDisplay.innerHTML = `
+            <div class="section-title">Details for ${titleDate}</div>
+            <div class="detailed-weather-grid">
+                <div class="detail-item"><span class="detail-icon">💨</span><span class="detail-label">Max Wind</span><span class="detail-value">${formatSpeed(daily.wind_speed_10m_max[index])}</span></div>
+                <div class="detail-item"><span class="detail-icon">🍃</span><span class="detail-label">Max Gusts</span><span class="detail-value">${formatSpeed(daily.wind_gusts_10m_max[index])}</span></div>
+                <div class="detail-item"><span class="detail-icon">☀️</span><span class="detail-label">Max UV Index</span><span class="detail-value">${formatUVIndex(daily.uv_index_max[index])}</span></div>
+                <div class="detail-item"><span class="detail-icon">🌅</span><span class="detail-label">Sunrise</span><span class="detail-value">${formatTime(daily.sunrise[index], timezone)}</span></div>
+                <div class="detail-item"><span class="detail-icon">☔</span><span class="detail-label">Total Precip.</span><span class="detail-value">${formatPrecip(daily.precipitation_sum[index])}</span></div>
+                <div class="detail-item"><span class="detail-icon">🌇</span><span class="detail-label">Sunset</span><span class="detail-value">${formatTime(daily.sunset[index], timezone)}</span></div>
+                <div class="detail-item"><span class="detail-icon">🤔</span><span class="detail-label">Max Precip. Prob.</span><span class="detail-value">${formatPercent(daily.precipitation_probability_max[index])}</span></div>
+                <div class="detail-item"><span class="detail-icon">ℹ️</span><span class="detail-label">Condition</span><span class="detail-value">${getWeatherDescription(daily.weather_code[index])}</span></div>
+            </div>`;
+    }
 
     // --- Utility Functions ---
-    function updateBackground(weatherCode) { /* As before */ bodyElement.className = 'loaded'; if ([0].includes(weatherCode)) bodyElement.classList.add('clear'); else if ([1, 2, 3].includes(weatherCode)) bodyElement.classList.add('clouds'); else if ([45, 48].includes(weatherCode)) bodyElement.classList.add('mist'); else if ([51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82, 95, 96, 99].includes(weatherCode)) bodyElement.classList.add('rain'); else if ([71, 73, 75, 77, 85, 86].includes(weatherCode)) bodyElement.classList.add('snow'); }
-    function getWeatherIcon(weatherCode) { /* As before */ const icons = { 0: '☀️', 1: '🌤️', 2: '🌥️', 3: '☁️', 45: '🌫️', 48: '🌫️', 51: '🌦️', 53: '🌦️', 55: '🌦️', 56: '🥶', 57: '🥶', 61: '🌧️', 63: '🌧️', 65: '🌧️', 66: '🥶', 67: '�', 71: '❄️', 73: '❄️', 75: '❄️', 77: '❄️', 80: '🌦️', 81: '🌦️', 82: '🌧️', 85: '🌨️', 86: '🌨️', 95: '⛈️', 96: '⛈️', 99: '⛈️' }; return icons[weatherCode] || '❓'; }
-    function getWeatherDescription(weatherCode) { /* As before */ const descriptions = { 0: "Clear sky", 1: "Mainly clear", 2: "Partly cloudy", 3: "Overcast", 45: "Fog", 48: "Depositing rime fog", 51: "Light drizzle", 53: "Moderate drizzle", 55: "Dense drizzle", 56: "Light freezing drizzle", 57: "Dense freezing drizzle", 61: "Slight rain", 63: "Moderate rain", 65: "Heavy rain", 66: "Light freezing rain", 67: "Heavy freezing rain", 71: "Slight snow fall", 73: "Moderate snow fall", 75: "Heavy snow fall", 77: "Snow grains", 80: "Slight rain showers", 81: "Moderate rain showers", 82: "Violent rain showers", 85: "Slight snow showers", 86: "Heavy snow showers", 95: "Thunderstorm", 96: "Thunderstorm with slight hail", 99: "Thunderstorm with heavy hail" }; return descriptions[weatherCode] || "Weather condition unavailable"; }
+    function updateBackground(weatherCode) { bodyElement.className = 'loaded'; if ([0].includes(weatherCode)) bodyElement.classList.add('clear'); else if ([1, 2, 3].includes(weatherCode)) bodyElement.classList.add('clouds'); else if ([45, 48].includes(weatherCode)) bodyElement.classList.add('mist'); else if ([51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82, 95, 96, 99].includes(weatherCode)) bodyElement.classList.add('rain'); else if ([71, 73, 75, 77, 85, 86].includes(weatherCode)) bodyElement.classList.add('snow'); }
+    function getWeatherIcon(weatherCode) { const icons = { 0: '☀️', 1: '🌤️', 2: '🌥️', 3: '☁️', 45: '🌫️', 48: '🌫️', 51: '🌦️', 53: '🌦️', 55: '🌦️', 56: '🥶', 57: '🥶', 61: '🌧️', 63: '🌧️', 65: '🌧️', 66: '🥶', 67: '�', 71: '❄️', 73: '❄️', 75: '❄️', 77: '❄️', 80: '🌦️', 81: '🌦️', 82: '🌧️', 85: '🌨️', 86: '🌨️', 95: '⛈️', 96: '⛈️', 99: '⛈️' }; return icons[weatherCode] || '❓'; }
+    function getWeatherDescription(weatherCode) { const descriptions = { 0: "Clear sky", 1: "Mainly clear", 2: "Partly cloudy", 3: "Overcast", 45: "Fog", 48: "Depositing rime fog", 51: "Light drizzle", 53: "Moderate drizzle", 55: "Dense drizzle", 56: "Light freezing drizzle", 57: "Dense freezing drizzle", 61: "Slight rain", 63: "Moderate rain", 65: "Heavy rain", 66: "Light freezing rain", 67: "Heavy freezing rain", 71: "Slight snow fall", 73: "Moderate snow fall", 75: "Heavy snow fall", 77: "Snow grains", 80: "Slight rain showers", 81: "Moderate rain showers", 82: "Violent rain showers", 85: "Slight snow showers", 86: "Heavy snow showers", 95: "Thunderstorm", 96: "Thunderstorm with slight hail", 99: "Thunderstorm with heavy hail" }; return descriptions[weatherCode] || "Weather condition unavailable"; }
     function celsiusToFahrenheit(celsius) { return (celsius * 9/5) + 32; }
 
     function toggleUnit() {
       isCelsius = !isCelsius;
       unitToggleButton.innerText = isCelsius ? 'Switch to °F' : 'Switch to °C';
-      if (currentWeatherData && currentLocation.timezone) { // Check if data and timezone exist
-          displayWeather(); // Re-render main weather (this recreates the time display div)
-          startLocalTimeClock(currentLocation.timezone); // *** FIX: Restart clock after re-render ***
+      if (currentWeatherData && currentLocation.timezone) {
+          displayWeather();
+          startLocalTimeClock(currentLocation.timezone);
 
-          // Re-render detail view if a day is selected
           const selectedDay = document.querySelector('.forecast-day.selected');
           if (selectedDay) {
               const index = parseInt(selectedDay.dataset.index, 10);
               displayForecastDetail(index);
               const detailDisplay = document.getElementById('forecast-detail-display');
-               if (detailDisplay) detailDisplay.classList.add('visible'); // Ensure detail visibility
+              if (detailDisplay) detailDisplay.classList.add('visible');
+          }
+
+          const selectedHour = document.querySelector('.hourly-item.selected');
+          if (selectedHour) {
+              const index = parseInt(selectedHour.dataset.index, 10);
+              displayHourlyDetail(index);
+              const detailDisplay = document.getElementById('hourly-detail-display');
+              if (detailDisplay) detailDisplay.classList.add('visible');
           }
       }
     }
 
-    function clearResults() { /* As before */ stopLocalTimeClock(); resultDiv.innerHTML = ''; resultDiv.classList.remove('visible'); errorDiv.innerText = ''; errorDiv.classList.remove('visible'); currentWeatherData = null; currentAirQualityData = null; currentLocation = {}; }
-    function showError(message) { /* As before */ stopLocalTimeClock(); errorDiv.innerText = `Error: ${message}`; errorDiv.classList.add('visible'); resultDiv.classList.remove('visible'); }
+    function clearResults() { stopLocalTimeClock(); resultDiv.innerHTML = ''; resultDiv.classList.remove('visible'); errorDiv.innerText = ''; errorDiv.classList.remove('visible'); currentWeatherData = null; currentAirQualityData = null; currentLocation = {}; }
+    function showError(message) { stopLocalTimeClock(); errorDiv.innerText = `Error: ${message}`; errorDiv.classList.add('visible'); resultDiv.classList.remove('visible'); }
   </script>
 </body>
 </html>
-�
